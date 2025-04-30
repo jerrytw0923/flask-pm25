@@ -8,6 +8,18 @@ import json
 app = Flask(__name__)
 
 
+@app.route("/filter", methods=["POST"])
+def filter_data():
+    # args=>form
+    county = request.form.get("county")
+    columns, datas = get_pm25_data_from_mysql()
+    df = pd.DataFrame(datas, columns=columns)
+    # 取得特定縣市的資料
+    df1 = df.groupby("county").get_group(county).groupby("site")["pm25"].mean()
+    print(df1)
+    return {"county": county}
+
+
 # 更新資料庫
 @app.route("/update-db")
 def update_pm25_db():
@@ -21,8 +33,34 @@ def update_pm25_db():
 
 @app.route("/")
 def index():
+    # 取得資料庫最新資料
     columns, datas = get_pm25_data_from_mysql()
-    return render_template("index.html", columns=columns, datas=datas)
+    # 取出不同縣市給select
+    df = pd.DataFrame(datas, columns=columns)
+    # 排序縣市
+    counties = sorted(df["county"].unique().tolist())
+
+    # 選取縣市後的資料(預設ALL)
+    county = request.args.get("county", "ALL")
+    if county != "ALL":
+        # 取得特定縣市的資料
+        df = df.groupby("county").get_group(county)
+        columns = df.columns.tolist()
+        datas = df.values.tolist()
+
+    # 繪製所需資料
+    x_data = df["site"].to_list()
+    y_data = df["pm25"].to_list()
+
+    return render_template(
+        "index.html",
+        columns=columns,
+        datas=datas,
+        counties=counties,
+        selected_county=county,
+        x_data=x_data,
+        y_data=y_data,
+    )
 
 
 @app.route("/books")
