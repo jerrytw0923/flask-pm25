@@ -7,13 +7,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
-    
+    <style>
+      #main{
+        text-align: center;
+        margin: 0 auto;
+      }
+    </style>
 </head>
 <body>
     <h1>細懸浮微粒資料（PM2.5）</h1>
     <h3>最新更新時間:{{datas[0][4]}}</h3>
 
-    <div id="main" style="width: 600px;height:400px;"></div>
+    <div id="main" style="width: 800px;height:400px;"></div>
 
 
 
@@ -29,11 +34,8 @@
             {% endfor %}
         </select>
         <button type="submit">查詢</button>
-    </form>
-    {{x_data}}
-    {{y_data}}
-      <div id="chart-data" data-labels="{{ x_data | tojson }}" data-values="{{ y_data | tojson }}"></div>
-
+    </form>    
+    <div id="chart-data" data-labels='{{ x_data | tojson }}' data-values='{{ y_data | tojson }}'></div>
     <h2 style="text-align: left;margin-left: 64px;color:rgb(54, 95, 6)">選擇縣市：{{selected_county}}</h2>
     <table border="1">
         <thead>
@@ -60,8 +62,7 @@
         const labels=JSON.parse(chartData.dataset.labels);
         const values=JSON.parse(chartData.dataset.values);
 
-        console.log(chartData,labels,values);
-        
+        console.log(chartData,labels,values);       
 
 
         var myChart = echarts.init(document.getElementById('main'));         
@@ -71,15 +72,20 @@
           },
           tooltip: {},
           legend: {
-            data: ['销量']
+            data: ['PM25']
           },
           xAxis: {
             data: labels
           },
+          dataZoom:[{
+            type:'slider',
+            start:0,
+            end:100
+          }],
           yAxis: {},
           series: [
             {
-              name: '销量',
+              name: 'PM25',
               type: 'bar',
               data: values
             }
