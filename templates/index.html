@@ -34,7 +34,10 @@
             {% endfor %}
         </select>
         <button type="submit">查詢</button>
-    </form>    
+    </form>  
+    
+    <a href="/pm25-site">詳細站點資訊</a>
+
     <div id="chart-data" data-labels='{{ x_data | tojson }}' data-values='{{ y_data | tojson }}'></div>
     <h2 style="text-align: left;margin-left: 64px;color:rgb(54, 95, 6)">選擇縣市：{{selected_county}}</h2>
     <table border="1">

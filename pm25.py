@@ -2,6 +2,48 @@ import pandas as pd
 import pymysql
 
 
+def get_site_by_county(county):
+    conn = None
+    sites = []
+    try:
+        conn = open_db()
+        cur = conn.cursor()
+        sqlstr = "select distinct site from pm25 where county=%s;"
+        cur.execute(sqlstr, (county,))
+        datas = cur.fetchall()
+        print(datas)
+        sites = [data[0] for data in datas]
+
+    except Exception as e:
+        print(e)
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return sites
+
+
+def get_all_counties():
+    conn = None
+    counties = []
+    try:
+        conn = open_db()
+        cur = conn.cursor()
+        sqlstr = "select distinct county from pm25;"
+        cur.execute(sqlstr)
+        datas = cur.fetchall()
+        print(datas)
+        counties = [data[0] for data in datas]
+
+    except Exception as e:
+        print(e)
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return counties
+
+
 # 更新資料庫
 def update_db():
     api_url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=540e2ca4-41e1-4186-8497-fdd67024ac44&limit=1000&sort=datacreationdate%20desc&format=CSV"
@@ -97,4 +139,5 @@ def get_pm25_data_from_mysql():
 # 本地運行
 if __name__ == "__main__":
     # update_db()
-    print(get_pm25_data_by_site("新北市", "桃園"))
+    # print(get_pm25_data_by_site("新北市", "桃園"))
+    print(get_site_by_county("高雄市"))
