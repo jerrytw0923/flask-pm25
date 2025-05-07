@@ -25,21 +25,32 @@
   
 
     <h3>選擇站點</h3>
-    <select name="site" id="site">
-        <option value="林口">林口</option>
-        <option value="富貴角">富貴角</option>
+    <select name="site" id="site">    
     </select>
-    <p><button type="button" onclick="query()">查詢</button></p>
+    <p><button type="button" onclick="query()">查詢</button></p>        
+    <!-- 顯示站點名稱 查詢後更改對應的站點名稱-->
+    <h2 id="SiteName"></h2>
     <div id="main" style="width: 800px;height:400px;"></div>
-    {{counties}}
+
+    <div id="panel">
+      <h3 style="color: black;">Higher:
+        <span class="higher" style="color:brown"></span>
+        <br>Lower:<span class="lower" style="color:rgb(0, 110, 255)">          
+        </span>
+      </h3>
+    </div>    
+    <a href="/">回首頁</a>
+
 <script>
     //取得county跟site element 
     const countyEl=document.querySelector("#county");
     const siteEl=document.querySelector("#site");
     const chart1 = echarts.init(document.getElementById('main')); 
 
-    countyEl.addEventListener("change",()=>{
-      console.log("change");      
+   
+    updateSite();
+
+    function updateSite(){
       let county=countyEl.value;
       const url=`/pm25-county-site?county=${county}`
         //從後端要求資料
@@ -56,16 +67,20 @@
               siteEl.appendChild(opt);
             }
         });
+    }
+
+
+    countyEl.addEventListener("change",()=>{      
+      updateSite();
     });
 
 
 
 
-    function drawChart(chart,site,labels,values){
-               
+    function drawChart(chart,site,labels,values){               
         var option = {
           title: {
-            text: `${site} PM2.5數據圖`
+            //text: `${site} PM2.5數據圖`
           },
           tooltip: {},
           legend: {
@@ -95,18 +110,21 @@
 
 
     function query(){
+     
         let county=countyEl.value;
         let site=siteEl.value;
-        const url=`/pm25-data-site?county=${county}&site=${site}`
+        const url=`/pm25-data-site?county=${county}&site=${site}`;
+
         //從後端要求資料
         fetch(url)
         .then(res=>res.json())
         .then(data=>{
-            console.log(data);     
-            
+            console.log(data);                             
+            document.querySelector("#SiteName").innerHTML=`［${county} - ${site}］`;
+            //取得最高/最低pm25
+            document.querySelector(".higher").innerHTML=data.higher;
+            document.querySelector(".lower").innerHTML=data.lower;
             drawChart(chart1,data.site,data.x_data,data.y_data);
-
-
         });
 
 

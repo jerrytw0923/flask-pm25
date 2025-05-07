@@ -41,11 +41,14 @@ def pm25_data_by_site():
         df = pd.DataFrame(datas, columns=columns)
         # 轉換字串時間格式
         date = df["datacreationdate"].apply(lambda x: x.strftime("%Y-%m-%d %H"))
+
         data = {
             "county": county,
             "site": site,
             "x_data": date.to_list(),
             "y_data": df["pm25"].to_list(),
+            "higher": df["pm25"].max(),
+            "lower": df["pm25"].min(),
         }
 
         result = json.dumps(data, ensure_ascii=False)
